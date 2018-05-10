@@ -1,0 +1,10 @@
+body {
+    background-color: #1B1F2A;
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+    height: 100%;
+}
+
+.chart-container{
+    padding:25px;
+}

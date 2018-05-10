@@ -1,0 +1,26 @@
+{
+  "name": "fsview",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neeerp/fsView.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neeerp/fsView/issues"
+  },
+  "homepage": "https://github.com/neeerp/fsView#readme",
+  "devDependencies": {
+    "electron": "^2.0.0"
+  },
+  "dependencies": {
+    "chart.js": "^2.7.2"
+  }
+}
