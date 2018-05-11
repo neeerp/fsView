@@ -5,7 +5,7 @@ const fs = require('fs');
  * children and their sizes, as well as the total size of the 
  * directory in bytes.
  * 
- * @param {string} dir The path to a directory
+ * @param {string} dir The path to a directory.
  * @return {Object} An object containing a <children> array whose elements
  *  contain a <file> name and its <size>, and a <total> which is just the sum
  *  of all of the children's sizes.
@@ -34,7 +34,7 @@ function findChildSizes(dir) {
 /** 
  * Returns the size of a file (or directory, recursively) in bytes.
  * 
- * @param {string} file The path to a file or directory
+ * @param {string} file The path to a file or directory.
  * @return {number} The file size in bytes.
  * */
 function findSize(file) {
