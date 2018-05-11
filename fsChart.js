@@ -1,49 +1,6 @@
 const Chart = require('chart.js');
-const { findChildSizes } = require('./findSize');
-
-/**
- * Generate an integer in the given range.
- * 
- * @param {Number} min The lower end of the range.
- * @param {Number} max The upper end of the range.
- * @return {Number} An integer within [min, max].
- */
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * Generate a random RGB color.
- * 
- * @return {String} an RGB color string.
- */
-function getRandomColor() {
-    let color = "rgb(" + 
-        getRandomInt(0, 255) + "," +
-        getRandomInt(0, 255) + "," +
-        getRandomInt(0, 255) + ")";
-
-    return color;
-}
-
-/**
- * Takes a number of bytes and outputs the number rounded and with
- * the relevant unit (i.e. B, KB, MB, GB).
- * 
- * @param {Number} bytes A number of bytes.
- * @return {String} The above number of bytes formatted with the relevant unit.
- */
-function formatBytes(bytes) {
-    if (bytes < 1024) {
-        return bytes + " B";
-    } else if (bytes < 1024 * 1024) {
-        return Math.floor(bytes / 1024) + " KB";
-    } else if (bytes < 1024 * 1024 * 1024) {
-        return Math.floor(bytes / (1024 * 1024)) + " MB";
-    } else {
-        return Math.floor(bytes / (1024 * 1024 * 1024)) + " GB";
-    }
-}
+const {findChildSizes} = require('./findSize');
+const {getRandomInt, getRandomColor, formatBytes} = require('./utils');
 
 /**
  * Generates and formats the size data of a given directory so that
@@ -54,26 +11,53 @@ function formatBytes(bytes) {
  */
 function generateSizeChartData(dir) {
     let children = findChildSizes(dir).children.sort(function(a, b) {
-        return a.size - b.size;
+        return b.size - a.size;
     });
 
     let paths = [];
     let sizes = [];
     let backgroundColor = [];
+    let count = 0;
 
-    children.forEach(e => {
-        paths.push(e.file);
-        sizes.push(e.size);
+    while (count < 19 && count < children.length) {
+        let cur = children[count];
+        paths.push(cur.file);
+        sizes.push(cur.size);
         backgroundColor.push(getRandomColor());
-    });
+        count++;
+    }
 
-    return {
+    let chartValues = {
         datasets: [{
             data: sizes,
             backgroundColor: backgroundColor
         }],
         labels: paths
     };
+
+    // Aggregate the remaining files & folders into an 'other' section
+    if (count < children.length) {
+        let otherPaths = [];
+        let otherSizes = [];
+        let totalSize = 0;
+        while (count < children.length) {
+            let cur = children[count];
+            otherPaths.push(cur.file);
+            otherSizes.push(cur.size);
+            totalSize += cur.size;
+            count++;
+        }
+
+        chartValues.labels.push("Other");
+        chartValues.datasets[0].backgroundColor.push(getRandomColor());
+        chartValues.datasets[0].data.push(totalSize);
+        chartValues.other = {
+            labels: otherPaths,
+            data: otherSizes 
+        }
+    }
+
+    return chartValues
 }
 
 window.onload = function() {
@@ -93,8 +77,10 @@ window.onload = function() {
                         return name + ": " + formatBytes(d.datasets[0].data[i.index]);
                     }
                 }
+            },
+            legend: {
+                position: 'right'
             }
         }
     });
-
 }
