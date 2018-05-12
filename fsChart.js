@@ -60,10 +60,12 @@ function generateSizeChartData(dir) {
     return chartValues
 }
 
+/** Start creating the chart on document load */
 window.onload = function() {
-    var data = generateSizeChartData("./node_modules");
 
+    var data = generateSizeChartData("C:/");
     var ctx = document.getElementById("donut").getContext("2d");
+    document.getElementById("chart-container").removeChild(document.getElementById("spinner"));
     var donut = new Chart(ctx, {
         type: "doughnut",
         data: data,
