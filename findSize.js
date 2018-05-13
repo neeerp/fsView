@@ -1,57 +1,81 @@
-const fs = require('fs');
+const {readdirAsync, statAsync} = require('./utils');
+const path = require('path');
 
-/** 
- * Returns an object containing an array of the given directory's
- * children and their sizes, as well as the total size of the 
- * directory in bytes.
+/**
+ * Given a path to a directory, returns a list of its children
+ * and their sizes.
  * 
- * @param {string} dir The path to a directory.
- * @return {Object} An object containing a <children> array whose elements
- *  contain a <file> name and its <size>, and a <total> which is just the sum
- *  of all of the children's sizes.
+ * @param {String} dir The path to the directory 
+ * @return {Promise} A promise resolving to an array of objects
+ *  containing a file name and its respective size.
  */
 function findChildSizes(dir) {
-    // directories that can't be read
-    try {
-        var files = fs.readdirSync(dir);
-    } catch (err) { return 0; }
-
-    var childAr = [];
-    var total = 0;
-    for (let i = 0; i < files.length; i++) {
-        var size = findSize(dir + "/" + files[i]);
-        if (isNaN(size)) continue; // Ignore files with invalid size
-        childAr.push({
-            file: files[i],
-            size: size
+    return readdirAsync(dir)
+    .then(function (files) {
+        var promises = files.map(function (file) {
+            return new Promise(function(resolve, reject) {
+                getSize(path.join(dir, file)).then(function (size) {
+                    resolve({
+                        file: file,
+                        size: size
+                    });
+                })
+                .catch(err => { // Handle unreadable children by setting size null
+                    resolve({
+                        file: file,
+                        size: null
+                    });
+                });
+            });
         });
-        total += size;
-    }
 
-    return {children: childAr, totalSize: total};
+        return Promise.all(promises);
+    })
+    .then(children => {
+        return children.filter(child => child.size !== null);
+    });
 }
 
-/** 
- * Returns the size of a file (or directory, recursively) in bytes.
+/**
+ * Given a path to a file/directory, find its size recursively.
  * 
- * @param {string} file The path to a file or directory.
- * @return {number} The file size in bytes.
- * */
-function findSize(file) {
-    // Ignore files & directories that can't be statted
-    try {
-        var stats = fs.statSync(file);
-    } catch(err) { return 0; }
-    
-    var size = stats.size;
-    if (stats.isDirectory()) {
-        size += findChildSizes(file).totalSize;
-    }
+ * @param {String} filePath The path to the file.
+ * @return {Promise} A promise resolving to the size of the file. 
+ */
+function getSize(filePath) {
+    return statAsync(filePath).then(function(stat) {
+        if (stat.isFile()) {
+            return stat.size;
+        } else {
+            return readdirAsync(filePath)
+            .then(function(files) {
+                var promises = files.map(function(file) {
+                    return path.join(filePath, file);
+                })
+                .map(getSize) // Recurse on directory's children
+                .map(promise => promise.catch(err => {
+                    // Handle unreadable files by setting their size to 0
+                    return 0;
+                }));
 
-    return size;
+                return Promise.all(promises);
+            })
+            .then(function(children) {
+                var size = 0;
+                children.forEach(function(childSize) {
+                    size += childSize;
+                });
+
+                return size;
+            })
+        }
+    });
 }
+
+// findChildSizes("C:/").then(function(size){
+//     console.log(size);
+// }).catch(console.error.bind(console));
 
 module.exports = {
-    findSize: findSize,
-    findChildSizes: findChildSizes
+    findChildSizes
 };

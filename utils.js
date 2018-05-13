@@ -1,3 +1,4 @@
+const fs = require('fs');
 
 /**
  * Generate an integer in the given range.
@@ -43,8 +44,39 @@ function formatBytes(bytes) {
     }
 }
 
+/**
+ * An asynchronous version of lstat which returns a promise.
+ * 
+ * @param {String} file The file to stat.
+ * @return {Promise} 
+ */
+function statAsync(file) {
+    return new Promise(function (resolve, reject) {
+        fs.lstat(file, function(err, stat) {
+            if (err) return reject(err);
+            resolve(stat);
+        })
+    });
+}
+
+/**
+ * An asynchronous version of readdir which returns a promise.
+ * @param {String} dir The directory to read.
+ * @return {Promise}
+ */
+function readdirAsync(dir) {
+    return new Promise(function (resolve, reject) {
+        fs.readdir(dir, function(err, files) {
+            if (err) reject(err);
+            resolve(files);
+        });
+    });
+}
+
 module.exports = {
     getRandomInt,
     getRandomColor,
-    formatBytes
+    formatBytes,
+    statAsync,
+    readdirAsync
 };

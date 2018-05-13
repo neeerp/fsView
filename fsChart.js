@@ -9,8 +9,8 @@ const {getRandomInt, getRandomColor, formatBytes} = require('./utils');
  * @param {String} dir The absolute path to a directory.
  * @return {Object} A data object for a chart.js chart.
  */
-function generateSizeChartData(dir) {
-    let children = findChildSizes(dir).children.sort(function(a, b) {
+function generateSizeChartData(files) {
+    files = files.sort(function(a, b) {
         return b.size - a.size;
     });
 
@@ -19,8 +19,8 @@ function generateSizeChartData(dir) {
     let backgroundColor = [];
     let count = 0;
 
-    while (count < 19 && count < children.length) {
-        let cur = children[count];
+    while (count < 19 && count < files.length) {
+        let cur = files[count];
         paths.push(cur.file);
         sizes.push(cur.size);
         backgroundColor.push(getRandomColor());
@@ -36,12 +36,12 @@ function generateSizeChartData(dir) {
     };
 
     // Aggregate the remaining files & folders into an 'other' section
-    if (count < children.length) {
+    if (count < files.length) {
         let otherPaths = [];
         let otherSizes = [];
         let totalSize = 0;
-        while (count < children.length) {
-            let cur = children[count];
+        while (count < files.length) {
+            let cur = files[count];
             otherPaths.push(cur.file);
             otherSizes.push(cur.size);
             totalSize += cur.size;
@@ -60,29 +60,36 @@ function generateSizeChartData(dir) {
     return chartValues
 }
 
+function generateChart(dir) {
+    findChildSizes(dir).then(files => {
+        console.log(files);
+        var data = generateSizeChartData(files);
+        var ctx = document.getElementById("donut").getContext("2d");
+        var donut = new Chart(ctx, {
+            type: "doughnut",
+            data: data,
+            options: {
+                tooltips: {
+                    callbacks: {
+                        label: (i, d) => {
+                            let index = i.index;
+                            let size = d.datasets[0].data[index];
+                            let name = d.labels[index];
+                            return name + ": " + formatBytes(d.datasets[0].data[i.index]);
+                        }
+                    }
+                },
+                legend: {
+                    position: 'right'
+                }
+            }
+        });
+        document.getElementById("chart-container").removeChild(document.getElementById("spinner"));
+    });
+}
+
+
 /** Start creating the chart on document load */
 window.onload = function() {
-
-    var data = generateSizeChartData("C:/");
-    var ctx = document.getElementById("donut").getContext("2d");
-    document.getElementById("chart-container").removeChild(document.getElementById("spinner"));
-    var donut = new Chart(ctx, {
-        type: "doughnut",
-        data: data,
-        options: {
-            tooltips: {
-                callbacks: {
-                    label: (i, d) => {
-                        let index = i.index;
-                        let size = d.datasets[0].data[index];
-                        let name = d.labels[index];
-                        return name + ": " + formatBytes(d.datasets[0].data[i.index]);
-                    }
-                }
-            },
-            legend: {
-                position: 'right'
-            }
-        }
-    });
+    generateChart("C:/");
 }
