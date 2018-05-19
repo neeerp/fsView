@@ -51,7 +51,7 @@ function findSize(file) {
     return size;
 }
 
-module.exports = {
-    findSize: findSize,
-    findChildSizes: findChildSizes
-};
+/** Upon being sent a directory, process its contents and send them back. */
+process.on('message', dir => {
+    process.send(findChildSizes(dir));
+});

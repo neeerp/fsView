@@ -1,49 +1,43 @@
 const Chart = require('chart.js');
-const {findChildSizes} = require('./findSize');
-const {getRandomInt, getRandomColor, formatBytes} = require('./utils');
+const { fork } = require('child_process');
+const { getRandomInt, getRandomColor, formatBytes } = require('./utils');
 
 /**
- * Generates and formats the size data of a given directory so that
+ * Formats the child size data of a given directory so that
  * it may be represented as a chart.
  * 
- * @param {String} dir The absolute path to a directory.
+ * @param {Object} data An object as returned by the findChildSizes method in findSize.js.
  * @return {Object} A data object for a chart.js chart.
  */
-function generateSizeChartData(dir) {
-    let children = findChildSizes(dir).children.sort(function(a, b) {
+function formatChartValues(data) {
+    // Declare the chart data object
+    let chartValues = {
+        datasets: [{
+            data: [],
+            backgroundColor: []
+        }],
+        labels: []
+    };
+
+    // Children of the chosen directory, in sorted order
+    let children = data.children.sort(function(a, b) {
         return b.size - a.size;
     });
 
-    let paths = [];
-    let sizes = [];
-    let backgroundColor = [];
+    // Create an entry for the 19 largest children
     let count = 0;
-
     while (count < 19 && count < children.length) {
         let cur = children[count];
-        paths.push(cur.file);
-        sizes.push(cur.size);
-        backgroundColor.push(getRandomColor());
+        chartValues.labels.push(cur.file);
+        chartValues.datasets[0].data.push(cur.size);
+        chartValues.datasets[0].backgroundColor.push(getRandomColor());
         count++;
     }
 
-    let chartValues = {
-        datasets: [{
-            data: sizes,
-            backgroundColor: backgroundColor
-        }],
-        labels: paths
-    };
-
     // Aggregate the remaining files & folders into an 'other' section
     if (count < children.length) {
-        let otherPaths = [];
-        let otherSizes = [];
         let totalSize = 0;
         while (count < children.length) {
-            let cur = children[count];
-            otherPaths.push(cur.file);
-            otherSizes.push(cur.size);
             totalSize += cur.size;
             count++;
         }
@@ -51,24 +45,23 @@ function generateSizeChartData(dir) {
         chartValues.labels.push("Other");
         chartValues.datasets[0].backgroundColor.push(getRandomColor());
         chartValues.datasets[0].data.push(totalSize);
-        chartValues.other = {
-            labels: otherPaths,
-            data: otherSizes 
-        }
     }
 
-    return chartValues
+    return chartValues;
 }
 
-/** Start creating the chart on document load */
-window.onload = function() {
-
-    var data = generateSizeChartData("C:/");
+/**
+ * Generates a donut chart in the given canvas, and replaces the spinner.
+ * 
+ * @param {Object} data A data object for a Chart.js chart 
+ */
+function generateChart(data) {
+    let chartData = formatChartValues(data);
     var ctx = document.getElementById("donut").getContext("2d");
     document.getElementById("chart-container").removeChild(document.getElementById("spinner"));
     var donut = new Chart(ctx, {
         type: "doughnut",
-        data: data,
+        data: chartData,
         options: {
             tooltips: {
                 callbacks: {
@@ -85,4 +78,13 @@ window.onload = function() {
             }
         }
     });
+}
+
+/** Start creating the chart on document load */
+window.onload = function() {
+    const worker = fork("findSize.js");
+    worker.on('message', data => {
+        generateChart(data);
+    });
+    worker.send(".");    
 }
