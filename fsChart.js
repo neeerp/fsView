@@ -58,7 +58,7 @@ function formatChartValues(data) {
 function generateChart(data) {
     let chartData = formatChartValues(data);
     var ctx = document.getElementById("donut").getContext("2d");
-    document.getElementById("chart-container").removeChild(document.getElementById("spinner"));
+    document.getElementById("spinner").style.display = "none";
     var donut = new Chart(ctx, {
         type: "doughnut",
         data: chartData,
