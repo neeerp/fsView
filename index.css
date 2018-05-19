@@ -51,6 +51,11 @@ body, html {
     -webkit-transition: opacity 1s ease-in-out;
 }
 
+#load-text {
+    cursor: default;
+    user-select: none;
+}
+
 .hidden {
     visibility: none;
     opacity: 0;
