@@ -8,17 +8,28 @@ body {
 
 #spinner {
     /** centre the spinner **/
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    margin-top: -80px;
-    margin-left: -80px;
-    border: 16px solid #f3f3f3;
+    /* position: fixed; */
+    margin: 0 auto;
+    transform: translate(-50%, 0%);
+    border: 16px solid #d3d3d3;
     border-top: 16px solid #3498db;
     border-radius: 50%;
     width:160px;
     height: 160px;
     animation: spin 2s linear infinite;
+}
+
+#loading * {
+    position: relative;
+    color: #e3e3e3;
+    font-weight: 400;
+}
+
+#loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 @keyframes spin {

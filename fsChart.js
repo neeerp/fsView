@@ -38,6 +38,7 @@ function formatChartValues(data) {
     if (count < children.length) {
         let totalSize = 0;
         while (count < children.length) {
+            let cur = children[count];
             totalSize += cur.size;
             count++;
         }
@@ -58,7 +59,7 @@ function formatChartValues(data) {
 function generateChart(data) {
     let chartData = formatChartValues(data);
     var ctx = document.getElementById("donut").getContext("2d");
-    document.getElementById("spinner").style.display = "none";
+    document.getElementById("loading").style.display = "none";
     var donut = new Chart(ctx, {
         type: "doughnut",
         data: chartData,
@@ -86,5 +87,5 @@ window.onload = function() {
     worker.on('message', data => {
         generateChart(data);
     });
-    worker.send(".");    
+    worker.send("C:\\Program Files");    
 }
