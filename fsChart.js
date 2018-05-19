@@ -1,6 +1,8 @@
 const Chart = require('chart.js');
 const { fork } = require('child_process');
-const { getRandomInt, getRandomColor, formatBytes } = require('./utils');
+const { getRandomInt, getRandomColor, formatBytes, formatTitle } = require('./utils');
+const ctx = document.getElementById("donut").getContext("2d");
+let donut;
 
 /**
  * Formats the child size data of a given directory so that
@@ -24,9 +26,9 @@ function formatChartValues(data) {
         return b.size - a.size;
     });
 
-    // Create an entry for the 19 largest children
+    // Create an entry for the 15 largest children
     let count = 0;
-    while (count < 19 && count < children.length) {
+    while (count < 16 && count < children.length) {
         let cur = children[count];
         chartValues.labels.push(cur.file);
         chartValues.datasets[0].data.push(cur.size);
@@ -56,13 +58,10 @@ function formatChartValues(data) {
  * 
  * @param {Object} data A data object for a Chart.js chart 
  */
-function generateChart(data) {
-    let chartData = formatChartValues(data);
-    var ctx = document.getElementById("donut").getContext("2d");
-    document.getElementById("loading").style.display = "none";
-    var donut = new Chart(ctx, {
+function generateChart(data) { 
+    donut = new Chart(ctx, {
         type: "doughnut",
-        data: chartData,
+        data: formatChartValues(data),
         options: {
             tooltips: {
                 callbacks: {
@@ -75,7 +74,17 @@ function generateChart(data) {
                 }
             },
             legend: {
-                position: 'right'
+                display: false
+            },
+            title: {
+                display: true,
+                position: 'bottom',
+                text: formatTitle(data.name),
+                fontSize: 18,
+                fontStyle: "normal",
+                fontFamily: "'Roboto', sans-serif",
+                fontColor: '#d3d3d3',
+                padding: 30
             }
         }
     });
@@ -86,6 +95,7 @@ window.onload = function() {
     const worker = fork("findSize.js");
     worker.on('message', data => {
         generateChart(data);
+        document.getElementById("loading").classList.add("hidden");
     });
     worker.send("C:\\Program Files");    
 }

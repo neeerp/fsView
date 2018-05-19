@@ -1,10 +1,41 @@
-body {
+body, html {
     background-color: #1B1F2A;
     width: 100%;
     font-family: 'Roboto', sans-serif;
     height: 100%;
+    margin: 0px;
+    padding: 0px;
 }
 
+/* Chart */
+#chart-container {
+    height: 100%;
+    width: 100%;
+}
+
+#donut {
+    position: absolute;
+    margin: 0 auto;
+    top: 75px;
+    animation: fadein .25s;
+}
+
+/* Loading */
+#loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    animation: fadein 1s;
+}
+
+#loading * {
+    position: relative;
+    color: #e3e3e3;
+    font-weight: 300;
+    font-size: 18px;
+    padding: 20px;
+}
 
 #spinner {
     /** centre the spinner **/
@@ -17,26 +48,22 @@ body {
     width:160px;
     height: 160px;
     animation: spin 2s linear infinite;
+    -webkit-transition: opacity 1s ease-in-out;
 }
 
-#loading * {
-    position: relative;
-    color: #e3e3e3;
-    font-weight: 400;
+.hidden {
+    visibility: none;
+    opacity: 0;
+    transition: visibility 0s .15s, opacity .15s;
 }
 
-#loading {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
+/* Animations */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-#donut {
-    margin-top: 50px;
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }

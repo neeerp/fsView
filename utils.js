@@ -1,4 +1,3 @@
-
 /**
  * Generate an integer in the given range.
  * 
@@ -43,8 +42,24 @@ function formatBytes(bytes) {
     }
 }
 
+/**
+ * Given the name of a directory, generate a title that fits within
+ * 45 characters.
+ * 
+ * @param {String} name The name of a directory.
+ * @return {String} A title string no longer than 45 characters. 
+ */
+function formatTitle(name) {
+    var title = "Space usage in " + name;
+    if (title.length > 45) {
+        title = title.slice(0, 42) + "...";
+    }
+    return title;
+}
+
 module.exports = {
     getRandomInt,
     getRandomColor,
-    formatBytes
+    formatBytes,
+    formatTitle
 };

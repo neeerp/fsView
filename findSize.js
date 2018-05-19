@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 /** 
  * Returns an object containing an array of the given directory's
@@ -28,7 +29,7 @@ function findChildSizes(dir) {
         total += size;
     }
 
-    return {children: childAr, totalSize: total};
+    return {children: childAr, totalSize: total, name: dir};
 }
 
 /** 
