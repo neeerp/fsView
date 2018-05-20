@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, globalShortcut} = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -13,6 +13,13 @@ function createWindow () {
     protocol: 'file:',
     slashes: true
   }));
+
+  win.webContents.openDevTools();
+  win.setMenu(null);
+
+  globalShortcut.register('f5', function() {
+		win.reload();
+	})
 }
 
 app.on('ready', createWindow);
