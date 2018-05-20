@@ -2,6 +2,8 @@ const Chart = require('chart.js');
 const { fork } = require('child_process');
 const { getRandomInt, getRandomColor, formatBytes, formatTitle } = require('./utils');
 const ctx = document.getElementById("donut").getContext("2d");
+const path = require('path');
+let dir;
 let donut;
 
 /**
@@ -30,7 +32,7 @@ function formatChartValues(data) {
     let count = 0;
     while (count < 16 && count < children.length) {
         let cur = children[count];
-        chartValues.labels.push(cur.file);
+        chartValues.labels.push(path.basename(cur.name));
         chartValues.datasets[0].data.push(cur.size);
         chartValues.datasets[0].backgroundColor.push(getRandomColor());
         count++;
@@ -58,7 +60,7 @@ function formatChartValues(data) {
  * 
  * @param {Object} data A data object for a Chart.js chart 
  */
-function generateChart(data) { 
+function generateChart(data) {
     donut = new Chart(ctx, {
         type: "doughnut",
         data: formatChartValues(data),
@@ -99,3 +101,5 @@ window.onload = function() {
     });
     worker.send("C:\\Program Files");    
 }
+
+

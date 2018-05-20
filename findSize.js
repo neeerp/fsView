@@ -2,54 +2,39 @@ const fs = require('fs');
 const path = require('path');
 
 /** 
- * Returns an object containing an array of the given directory's
- * children and their sizes, as well as the total size of the 
- * directory in bytes.
+ * Returns an object containing data about the file, and its children
+ * if the file was a directory.
  * 
- * @param {string} dir The path to a directory.
- * @return {Object} An object containing a <children> array whose elements
- *  contain a <file> name and its <size>, and a <total> which is just the sum
- *  of all of the children's sizes.
+ * @param {string} file A path to a file.
+ * @return {Object} An object containing a file <name>, a file <type>,
+ *  a file <size>, and a <children> array of the same sort of object.
  */
-function findChildSizes(dir) {
-    // directories that can't be read
+function findChildSizes(file) {
     try {
-        var files = fs.readdirSync(dir);
-    } catch (err) { return 0; }
-
-    var childAr = [];
-    var total = 0;
-    for (let i = 0; i < files.length; i++) {
-        var size = findSize(dir + "/" + files[i]);
-        if (isNaN(size)) continue; // Ignore files with invalid size
-        childAr.push({
-            file: files[i],
-            size: size
-        });
-        total += size;
-    }
-
-    return {children: childAr, totalSize: total, name: dir};
-}
-
-/** 
- * Returns the size of a file (or directory, recursively) in bytes.
- * 
- * @param {string} file The path to a file or directory.
- * @return {number} The file size in bytes.
- * */
-function findSize(file) {
-    // Ignore files & directories that can't be statted
-    try {
+        var type = "file";
+        var size = 0;
+        var childAr;
         var stats = fs.statSync(file);
-    } catch(err) { return 0; }
-    
-    var size = stats.size;
-    if (stats.isDirectory()) {
-        size += findChildSizes(file).totalSize;
-    }
+        if (stats.isDirectory()) { // File is a directory, recurse
+            let type = "directory"
+            let children = fs.readdirSync(file);
 
-    return size;
+            childAr = children.map(child => {
+                let childData = findChildSizes(path.join(file, child));
+                size += childData.size;
+                return childData;
+            });
+        } else { // File is a regular file
+            size = stats.size ? stats.size : 0;
+        }
+    } catch (err) {} // Unreadable file; ignore it. 
+
+    return {
+        name: file,
+        type: type,
+        size: size ? size : 0,
+        children: childAr
+    }
 }
 
 /** Upon being sent a directory, process its contents and send them back. */
