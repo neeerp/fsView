@@ -7,6 +7,21 @@ body, html {
     padding: 0px;
 }
 
+/* Buttons */
+#button-box {
+    position: fixed;
+    height: 30px;
+    width: 100%;
+    border: 2px solid black;
+}
+
+#block {
+    height: 20px;
+    width: 20px;
+    padding: 5px 10px;
+    border: 2px solid red;
+}
+
 /* Chart */
 #chart-container {
     height: 100%;

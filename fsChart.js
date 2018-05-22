@@ -5,6 +5,7 @@ const ctx = document.getElementById("donut").getContext("2d");
 const path = require('path');
 let dir;
 let donut;
+let dirData;
 
 /**
  * Formats the child size data of a given directory so that
@@ -23,15 +24,15 @@ function formatChartValues(data) {
         labels: []
     };
 
-    // Children of the chosen directory, in sorted order
-    let children = data.children.sort(function(a, b) {
+    dirData = data;
+    dirData.children = dirData.children.sort(function(a, b) {
         return b.size - a.size;
     });
 
     // Create an entry for the 15 largest children
     let count = 0;
-    while (count < 16 && count < children.length) {
-        let cur = children[count];
+    while (count < 16 && count < dirData.children.length) {
+        let cur = dirData.children[count];
         chartValues.labels.push(path.basename(cur.name));
         chartValues.datasets[0].data.push(cur.size);
         chartValues.datasets[0].backgroundColor.push(getRandomColor());
@@ -39,10 +40,10 @@ function formatChartValues(data) {
     }
 
     // Aggregate the remaining files & folders into an 'other' section
-    if (count < children.length) {
+    if (count < dirData.children.length) {
         let totalSize = 0;
-        while (count < children.length) {
-            let cur = children[count];
+        while (count < dirData.children.length) {
+            let cur = dirData.children[count];
             totalSize += cur.size;
             count++;
         }
@@ -65,6 +66,15 @@ function generateChart(data) {
         type: "doughnut",
         data: formatChartValues(data),
         options: {
+            onClick: function (e, elements) {
+                if (elements.length) {
+                    let element = dirData.children[elements[0]._index];
+                    console.log(element);
+                    if (element.type === "directory") {
+                        stepIn(element);
+                    }
+                }
+            },
             tooltips: {
                 callbacks: {
                     label: (i, d) => {
@@ -92,14 +102,34 @@ function generateChart(data) {
     });
 }
 
+function stepIn(element) {
+    element.parent = dirData;
+    donut.data = formatChartValues(element);
+    donut.options.title.text = formatTitle(element.name);
+    donut.update();
+}
+
+function stepOut() {
+    console.log("hey");
+    if (dirData.parent) {
+        donut.data = formatChartValues(dirData.parent);
+        donut.options.title.text = formatTitle(dirData.name);
+        donut.update();
+    }
+}
+
+
+
 /** Start creating the chart on document load */
 window.onload = function() {
     const worker = fork("findSize.js");
     worker.on('message', data => {
+        console.log(data);
         generateChart(data);
         document.getElementById("loading").classList.add("hidden");
     });
     worker.send("C:\\Program Files");    
+    document.getElementById("block").onclick = stepOut;
 }
 
 

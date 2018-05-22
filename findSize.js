@@ -16,7 +16,7 @@ function findChildSizes(file) {
         var childAr;
         var stats = fs.statSync(file);
         if (stats.isDirectory()) { // File is a directory, recurse
-            let type = "directory"
+            type = "directory"
             let children = fs.readdirSync(file);
 
             childAr = children.map(child => {
