@@ -1,6 +1,7 @@
 const Chart = require('chart.js');
 const { fork } = require('child_process');
 const { getRandomInt, getRandomColor, formatBytes, formatTitle } = require('./utils');
+const { remote } = require('electron');
 const ctx = document.getElementById("donut").getContext("2d");
 const path = require('path');
 let donut;
@@ -48,6 +49,18 @@ function initializeChart() {
     });
 }
 
+function openModal() {
+  let win = new remote.BrowserWindow({
+    parent: remote.getCurrentWindow(),
+    modal: true
+  })
+
+  var theUrl = 'file://' + __dirname + '/modal.html'
+  console.log('url', theUrl);
+
+  win.loadURL(theUrl);
+}
+
 /**
  * Update the chart's data with a new file directory.
  * 
@@ -56,7 +69,7 @@ function initializeChart() {
 function updateChart(data) {
     currentDir = data;
     donut.data = formatChartData(data);
-    donut.options.title.text = "Current Directory: " + data.name;
+    donut.options.title.text = formatTitle(data.name);
     donut.update();
 }
 
@@ -115,5 +128,6 @@ window.onload = function() {
         document.getElementById("loading").classList.add("hidden");
     });
     worker.send("C:\\Program Files");    
-    document.getElementById("block").onclick = stepOut;
+    document.getElementById("back").onclick = stepOut;
+    document.getElementById("new").onclick = openModal;
 }
