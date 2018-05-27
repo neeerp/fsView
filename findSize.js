@@ -32,7 +32,9 @@ function findChildSizes(file) {
         } else { // File is a regular file
             size = stats.size ? stats.size : 0;
         }
-    } catch (err) {} // Unreadable file; ignore it. 
+    } catch (err) {
+        console.log(err);
+    } // Unreadable file; ignore it. 
 
     return {
         name: file,

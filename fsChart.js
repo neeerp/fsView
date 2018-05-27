@@ -2,18 +2,39 @@ const Chart = require('chart.js');
 const { fork } = require('child_process');
 const { getRandomInt, getRandomColor, formatBytes, formatTitle } = require('./utils');
 const { remote } = require('electron');
-const ctx = document.getElementById("donut").getContext("2d");
 const path = require('path');
+
+/** Global variables */
 let donut;
 let dirStack;
 let currentDir;
 
+/** Set up child process */
+const worker = fork("findSize.js", [], { silent: true });
+worker.on('message', data => {
+    // Set up a new graph.
+    dirStack = [];
+    initializeChart();
+    updateChart(data);
+    document.getElementById("loading").classList.add("hidden");
+});
+
+worker.stdout.on('data', function(data) {
+    // Print errors to console.
+    console.log(data.toString()); 
+});
+
 /**
- * Generates a donut chart in the given canvas, and replaces the spinner.
+ * Sets up a new canvas, replaces the spinner, and generates a new chart with
+ * no data.
  * 
  * @param {Object} data A data object for a Chart.js chart 
  */
 function initializeChart() {
+    var canvas = "<canvas id=\"donut\" />";
+    document.getElementById("chart-container").innerHTML = canvas;
+    let ctx = document.getElementById("donut").getContext("2d");
+
     donut = new Chart(ctx, {
         type: "doughnut",
         options: {
@@ -47,18 +68,6 @@ function initializeChart() {
             }
         }
     });
-}
-
-function openModal() {
-  let win = new remote.BrowserWindow({
-    parent: remote.getCurrentWindow(),
-    modal: true
-  })
-
-  var theUrl = 'file://' + __dirname + '/modal.html'
-  console.log('url', theUrl);
-
-  win.loadURL(theUrl);
 }
 
 /**
@@ -100,6 +109,26 @@ function formatChartData(data) {
     }
 }
 
+/**
+ * Prompt the user to select a new directory, and then clear the screen
+ * and generate a new graph.
+ */
+function resetGraph() {
+    var newDir = remote.dialog.showOpenDialog({
+        properties: ['openDirectory']
+    });
+
+    if(newDir) {
+        document.getElementById("chart-container").innerHTML = null;
+        document.getElementById("loading").classList.remove("hidden");
+        worker.send(newDir[0]);
+    }
+}
+
+/**
+ * Update the graph to view the selected directory instead.
+ * @param {A list of clicked objects} elements 
+ */
 function stepIn(e, elements) {
     if (elements.length) {
         let nextDir = currentDir.children[elements[0]._index];
@@ -110,6 +139,9 @@ function stepIn(e, elements) {
     }
 }
 
+/**
+ * Update the graph to view the previous directory instead.
+ */
 function stepOut() {
     if (dirStack.length) {
         let nextDir = dirStack.pop();
@@ -117,17 +149,9 @@ function stepOut() {
     }
 }
 
-/** Start creating the chart on document load */
+/** Set up event handlers and start generating an initial chart. */
 window.onload = function() {
-    const worker = fork("findSize.js");
-    worker.on('message', data => {
-        console.log(data);
-        dirStack = [];
-        if (!donut) {initializeChart()};
-        updateChart(data);
-        document.getElementById("loading").classList.add("hidden");
-    });
     worker.send("C:\\Program Files");    
     document.getElementById("back").onclick = stepOut;
-    document.getElementById("new").onclick = openModal;
+    document.getElementById("new").onclick = resetGraph;
 }
