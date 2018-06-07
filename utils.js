@@ -1,3 +1,5 @@
+const path = require('path');
+
 /**
  * Generate an integer in the given range.
  * 
@@ -50,10 +52,10 @@ function formatBytes(bytes) {
  * @return {String} A title string no longer than 45 characters. 
  */
 function formatTitle(name) {
-    var title = "Space usage in " + name;
-    if (title.length > 45) {
-        title = title.slice(0, 42) + "...";
+    if (name.length > 70) {
+        name = "\\...\\" + path.basename(name);
     }
+    var title = "Current Directory: " + name;
     return title;
 }
 

@@ -7,6 +7,50 @@ body, html {
     padding: 0px;
 }
 
+/* Buttons */
+#button-box {
+    position: fixed;
+    height: 30px;
+    width: 100%;
+
+    margin-top: 5px;
+}
+
+.block {
+    height: 22px;
+    width: 12px;
+    padding: 2px 10px;
+    margin: 0 5px;
+    float: right;
+
+    border: 2px solid rgba(67, 74, 91, 1);
+    border-radius: 9px;
+
+    color: lightslategray;
+    text-align: center;
+    font-weight: bold;
+
+    background: rgba(255, 255, 255, .05);
+    transition: ease-in-out .25s;
+
+    cursor: default;
+    user-select: none;
+}
+
+
+.block:hover {
+    background: rgba(255, 255, 255, .2);
+}
+
+#back span {
+    line-height: 20px;
+}
+
+#new span {
+    font-size: 18px;
+    line-height: 18px;
+}
+
 /* Chart */
 #chart-container {
     height: 100%;
