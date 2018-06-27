@@ -3,26 +3,36 @@ const { fork } = require('child_process');
 const { getRandomInt, getRandomColor, formatBytes, formatTitle } = require('./utils');
 const { remote } = require('electron');
 const path = require('path');
+const ipc = require('electron').ipcRenderer;
+const BrowserWindow = require('electron').remote.BrowserWindow;
+
+// TODO: Modularize this so that it's self contained. Should probably separate anything graph related
+// from anything relating to communicating between processes.
 
 /** Global variables */
 let donut;
 let dirStack;
 let currentDir;
+let worker;
 
-/** Set up child process */
-const worker = fork("findSize.js", [], { silent: true });
-worker.on('message', data => {
-    // Set up a new graph.
+
+/** Create a child window and send it a work request. */
+function getDirs(dir) {
+    worker = new BrowserWindow({show: false});
+    worker.loadURL(path.join(__dirname, 'worker.html'));
+    worker.webContents.on('did-finish-load', () => {
+        worker.webContents.send('message', dir);
+    });
+}
+
+ipc.on('reply', (event, message) => {
+    console.log(message);
     dirStack = [];
     initializeChart();
-    updateChart(data);
+    updateChart(message);
+    worker = null;
     document.getElementById("loading").classList.add("hidden");
-});
-
-worker.stdout.on('data', function(data) {
-    // Print errors to console.
-    console.log(data.toString()); 
-});
+})
 
 /**
  * Sets up a new canvas, replaces the spinner, and generates a new chart with
@@ -121,7 +131,8 @@ function resetGraph() {
     if(newDir) {
         document.getElementById("chart-container").innerHTML = null;
         document.getElementById("loading").classList.remove("hidden");
-        worker.send(newDir[0]);
+        getDirs(newDir[0])
+        //worker.send(newDir[0]);
     }
 }
 
@@ -149,9 +160,12 @@ function stepOut() {
     }
 }
 
+
+
+
 /** Set up event handlers and start generating an initial chart. */
-window.onload = function() {
-    worker.send("C:\\Program Files");    
+window.onload = function() {  
+    getDirs(".");
     document.getElementById("back").onclick = stepOut;
     document.getElementById("new").onclick = resetGraph;
 }
