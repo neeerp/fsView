@@ -1,10 +1,10 @@
 const Chart = require('chart.js');
-const { fork } = require('child_process');
-const { getRandomInt, getRandomColor, formatBytes, formatTitle } = require('./utils');
-const { remote } = require('electron');
+const { getRandomColor, formatBytes, formatTitle } = require('./utils');
+const electron = require('electron');
+const remote = electron.remote;
+const ipc = electron.ipcRenderer;
+const BrowserWindow = remote.BrowserViewl
 const path = require('path');
-const ipc = require('electron').ipcRenderer;
-const BrowserWindow = require('electron').remote.BrowserWindow;
 
 // TODO: Modularize this so that it's self contained. Should probably separate anything graph related
 // from anything relating to communicating between processes.
@@ -159,9 +159,6 @@ function stepOut() {
         updateChart(nextDir);
     }
 }
-
-
-
 
 /** Set up event handlers and start generating an initial chart. */
 window.onload = function() {  

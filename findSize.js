@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const ipc = require('electron').ipcRenderer;
+const electron = require('electron');
+const ipc = electron.ipcRenderer;
 
 /** 
  * Returns an object containing data about the file, and its children
@@ -72,7 +73,10 @@ function consolidateAfterN(files, n) {
     return files;
 }
 
+/**
+ * Upon receiving a directory to check, traverse it and return the results
+ * to the main process.
+ */
 ipc.on('message', (event, message) => {
-    console.log(message);
     ipc.send('reply', findChildSizes(message));
 });
