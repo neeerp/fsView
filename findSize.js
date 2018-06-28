@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const electron = require('electron');
 const ipc = electron.ipcRenderer;
+const remote = electron.remote;
 
 /** 
  * Returns an object containing data about the file, and its children
@@ -79,4 +80,5 @@ function consolidateAfterN(files, n) {
  */
 ipc.on('message', (event, message) => {
     ipc.send('reply', findChildSizes(message));
+    remote.getCurrentWindow().close();
 });
