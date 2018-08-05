@@ -34,3 +34,7 @@ function main() {
 }
 
 app.on('ready', main);
+
+app.on('window-all-closed', () => {
+  app.quit();
+});

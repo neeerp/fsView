@@ -11,7 +11,6 @@ const { initializeChart, stepOut, updateChart } = require('./chart.js');
 /** Global variables */
 let worker;
 
-
 /** Create a child window and send it a work request. */
 function getDirs(dir) {
     worker = new BrowserWindow({show: false});
@@ -49,7 +48,7 @@ function resetGraph() {
 
 /** Set up event handlers and start generating an initial chart. */
 window.onload = function() {  
-    getDirs(".");
+    getDirs(process.cwd());
     document.getElementById("back").onclick = stepOut;
     document.getElementById("new").onclick = resetGraph;
 }
