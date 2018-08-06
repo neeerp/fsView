@@ -1,7 +1,8 @@
 {
   "name": "fsview",
-  "version": "1.0.0",
-  "description": "",
+  "productName": "fsView",
+  "version": "0.1.0",
+  "description": "An application providing a means of viewing file system space usage.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -18,9 +19,12 @@
   },
   "homepage": "https://github.com/neeerp/fsView#readme",
   "devDependencies": {
-    "electron": "^2.0.0"
+    "electron": "^2.0.0",
+    "electron-packager": "^12.1.0",
+    "electron-winstaller": "^2.6.4"
   },
   "dependencies": {
-    "chart.js": "^2.7.2"
+    "chart.js": "^2.7.2",
+    "winreg": "^1.2.4"
   }
 }
