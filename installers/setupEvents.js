@@ -1,6 +1,6 @@
 const electron = require('electron')
 const app = electron.app
-const WinShell = require('../winshell.js');
+const WinShell = require('./windows/winshell.js');
 
 module.exports = {
     handleSquirrelEvent: function() {
@@ -24,7 +24,7 @@ module.exports = {
             // Undo anything you did in the --squirrel-install and
             // --squirrel-updated handlers
  
-            WinShell.folderBackgroundContextMenu.deregister(app.quit())
+            WinShell.folderBackgroundContextMenu.deregister(app.quit);
 
             return true;
 
