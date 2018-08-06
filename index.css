@@ -92,7 +92,6 @@ body, html {
     width:160px;
     height: 160px;
     animation: spin 2s linear infinite;
-    -webkit-transition: opacity 1s ease-in-out;
 }
 
 #load-text {
@@ -103,7 +102,8 @@ body, html {
 .hidden {
     visibility: none;
     opacity: 0;
-    transition: visibility 0s .15s, opacity .15s;
+    transition: visibility 0.5s;
+    transition: opacity 0.25s ease-in-out;
 }
 
 /* Animations */
