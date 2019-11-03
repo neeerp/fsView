@@ -5,9 +5,6 @@ const BrowserWindow = remote.BrowserWindow
 const path = require('path');
 const { initializeChart, stepOut, updateChart } = require('./chart.js');
 
-// TODO: Modularize this so that it's self contained. Should probably separate anything graph related
-// from anything relating to communicating between processes.
-
 /** Global variables */
 let worker;
 
@@ -21,7 +18,6 @@ function getDirs(dir) {
 }
 
 ipc.on('reply', (event, data) => {
-    console.log(data);
     initializeChart();
     updateChart(data, true);
     worker = null;

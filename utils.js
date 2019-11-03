@@ -46,10 +46,10 @@ function formatBytes(bytes) {
 
 /**
  * Given the name of a directory, generate a title that fits within
- * 45 characters.
+ * max(70, base name of path) characters
  * 
  * @param {String} name The name of a directory.
- * @return {String} A title string no longer than 45 characters. 
+ * @return {String} A title string no longer than 70 characters. 
  */
 function formatTitle(name) {
     if (name.length > 70) {

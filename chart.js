@@ -18,7 +18,7 @@ function stepIn(e, elements) {
         let nextDir = currentDir.children[elements[0]._index];
         if (nextDir.type === "Directory") {
             dirStack.push(currentDir);
-            updateChart(nextDir);
+            updateChart(nextDir, false);
         }
     }
 }
@@ -36,8 +36,6 @@ function stepOut() {
 /**
  * Sets up a new canvas, replaces the spinner, and generates a new chart with
  * no data.
- * 
- * @param {Object} data A data object for a Chart.js chart 
  */
 function initializeChart() {
     var canvas = "<canvas id=\"donut\" />";
@@ -83,6 +81,7 @@ function initializeChart() {
  * Update the chart's data with a new file directory.
  * 
  * @param {Object} data A file object.
+ * @param {Boolean} clear Flag to reset visited directories stack.
  */
 function updateChart(data, clear) {
     currentDir = data;

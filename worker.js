@@ -1,3 +1,12 @@
+/**
+ * Script for the hidden worker window that gets data for the main chart.
+ * 
+ * Upon creation, the worker window receives a message with a directory path
+ * and proceeds to recursively traverse the directory, gathering information
+ * about the size of its constitutent files. It then returns this information
+ * to the main window before automatically closing itself.
+ */
+
 const fs = require('fs');
 const path = require('path');
 const electron = require('electron');
@@ -35,9 +44,9 @@ function findChildSizes(file) {
         } else { // File is a regular file
             size = stats.size ? stats.size : 0;
         }
-    } catch (err) {
+    } catch (err) { // Unreadable file; ignore it && log
         console.log(err);
-    } // Unreadable file; ignore it. 
+    } 
 
     return {
         name: file,
