@@ -22,7 +22,7 @@ fsView allows you to traverse the file directory it has opened. You can view the
 
 ## Creating an installer
 
-To install fsView, firsy clone this repository and run 
+To install fsView, first clone this repository and run 
 ```
 $ npm init
 ```
